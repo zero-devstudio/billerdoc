@@ -1023,3 +1023,140 @@ CONTENEDOR ANCLADO ABAJO
     box-shadow: none;
     transform: none;
 }
+
+/* =========================
+   UPDATES VIEW
+========================= */
+
+.updates-view {
+    max-width: 520px;
+    margin: 40px auto;
+    padding: 28px 32px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.06);
+}
+
+.updates-view h2 {
+    margin-bottom: 16px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.update-status {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 24px;
+    padding: 12px 14px;
+    background: #f3f4f6;
+    border-radius: 10px;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.updates-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.updates-actions button {
+    flex: 1;
+    min-width: 140px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, opacity .15s;
+}
+
+/* =========================
+   BUTTON STYLES
+========================= */
+
+.btn-primary {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+}
+
+.updates-actions button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.updates-actions button:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+
+/* =========================
+   PROGRESS
+========================= */
+
+.update-progress-wrapper {
+    margin-top: 12px;
+}
+
+.update-progress-wrapper progress {
+    width: 100%;
+    height: 12px;
+    border-radius: 20px;
+    overflow: hidden;
+    appearance: none;
+}
+
+.update-progress-wrapper progress::-webkit-progress-bar {
+    background: #e5e7eb;
+    border-radius: 20px;
+}
+
+.update-progress-wrapper progress::-webkit-progress-value {
+    background: linear-gradient(90deg, #6366f1, #22c55e);
+    border-radius: 20px;
+}
+/* =========================
+   STATUS VARIANTS
+========================= */
+.update-status {
+    font-size: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #f3f4f6;
+    color: #374151;
+    margin-bottom: 20px;
+}
+
+.update-status.info {
+    background: #eef2ff;
+    color: #3730a3;
+}
+
+.update-status.success {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.update-status.error {
+    background: #fef2f2;
+    color: #991b1b;
+}

@@ -36,8 +36,15 @@ contextBridge.exposeInMainWorld('empresa', {
 });
 
 contextBridge.exposeInMainWorld('updates', {
-    onAvailable: (callback) => ipcRenderer.on('update-available', (_, v) => callback(v)),
-    onProgress: (callback) => ipcRenderer.on('update-progress', (_, p) => callback(p)),
-    onDownloaded: (callback) => ipcRenderer.on('update-downloaded', callback),
-    install: () => ipcRenderer.send('install-update')
+    check: () => ipcRenderer.invoke('updates-check'),
+    download: () => ipcRenderer.invoke('updates-download'),
+    install: () => ipcRenderer.invoke('updates-install'),
+
+    onChecking: cb => ipcRenderer.on('update-checking', cb),
+    onAvailable: (cb) => ipcRenderer.on('update-available', (_, info) => cb(info)),
+    onNotAvailable: cb => ipcRenderer.on('update-not-available', cb),
+    onProgress: (cb) => ipcRenderer.on('update-progress', (_, p) => cb(p)),
+    onDownloaded: cb => ipcRenderer.on('update-downloaded', cb),
+    onError: (cb) => ipcRenderer.on('update-error', (_, msg) => cb(msg))
 });
+

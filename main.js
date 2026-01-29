@@ -5,12 +5,22 @@ const fs = require('fs');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
+app.disableHardwareAcceleration();
+
+/* =====================
+   IMPORTS
+===================== */
+
 const createDatabase = require('./modules/db');
 const generarReciboConPlantilla = require('./pdf/generatePdfFromTemplate');
 const auth = require('./modules/auth');
 
 const crearEntidades = require('./modules/entidades');
 const crearEmpresa = require('./modules/empresa');
+
+/* =====================
+   GLOBAL STATE
+===================== */
 
 let mainWindow;
 let splashWindow;
@@ -59,111 +69,90 @@ function createMainWindow() {
         }
     });
 
-    if (session) {
-        mainWindow.loadFile('index.html');
-    } else {
-        mainWindow.loadFile('views/login.html');
-    }
+    mainWindow.loadFile(session ? 'index.html' : 'views/login.html');
 }
 
 /* =====================
-   AUTO UPDATER
+   AUTO UPDATE
 ===================== */
 
 function configurarAutoUpdate() {
-
-    autoUpdater.autoDownload = true;
-    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = false;
 
     autoUpdater.on('checking-for-update', () => {
-        log.info('🔍 Buscando actualizaciones...');
+        mainWindow.webContents.send('update-checking');
     });
 
-    autoUpdater.on('update-available', (info) => {
-        log.info('⬇️ Actualización disponible:', info.version);
-        mainWindow.webContents.send('update-available', info.version);
+    autoUpdater.on('update-available', info => {
+        mainWindow.webContents.send('update-available', info);
     });
 
     autoUpdater.on('update-not-available', () => {
-        log.info('✅ No hay actualizaciones');
+        mainWindow.webContents.send('update-not-available');
     });
 
-    autoUpdater.on('error', (err) => {
-        log.error('❌ Error en auto-update:', err);
+    autoUpdater.on('download-progress', progress => {
+        mainWindow.webContents.send('update-progress', {
+            percent: Math.round(progress.percent)
+        });
     });
 
-    autoUpdater.on('download-progress', (progress) => {
-        mainWindow.webContents.send(
-            'update-progress',
-            Math.round(progress.percent)
-        );
+    autoUpdater.on('update-downloaded', info => {
+        mainWindow.webContents.send('update-downloaded', info);
     });
 
-    autoUpdater.on('update-downloaded', () => {
-        log.info('✅ Actualización descargada');
-        mainWindow.webContents.send('update-downloaded');
+    autoUpdater.on('error', err => {
+        mainWindow.webContents.send('update-error', err.message);
     });
 }
 
 /* =====================
-   APP READY
+   APP READY (UNA SOLA VEZ)
 ===================== */
 
 app.whenReady().then(async () => {
 
-    const start = Date.now();
     createSplash();
+    const start = Date.now();
 
-    // 🔹 Inicializaciones
+    // 🔹 DB + módulos (ANTES de IPC)
     db = createDatabase();
     entidades = crearEntidades(db);
     empresa = crearEmpresa(db);
 
+    // 🔹 Ventana
     createMainWindow();
     configurarAutoUpdate();
 
-    // Esperar a que la ventana esté lista
     await new Promise(resolve => {
         mainWindow.once('ready-to-show', resolve);
     });
 
-    // Splash mínimo visible
-    const MIN_SPLASH_TIME = 2500;
+    // 🔹 Tiempo mínimo splash
+    const MIN_SPLASH = 2500;
     const elapsed = Date.now() - start;
-
-    if (elapsed < MIN_SPLASH_TIME) {
-        await new Promise(r => setTimeout(r, MIN_SPLASH_TIME - elapsed));
+    if (elapsed < MIN_SPLASH) {
+        await new Promise(r => setTimeout(r, MIN_SPLASH - elapsed));
     }
 
-    splashWindow.close();
+    splashWindow?.close();
     mainWindow.show();
 
-    // 🔥 Buscar updates (IMPORTANTE)
-    setTimeout(() => {
-        autoUpdater.checkForUpdatesAndNotify();
-    }, 3000);
-});
-
-/* =====================
-   IPC - UPDATES
-===================== */
-
-ipcMain.on('install-update', () => {
-    autoUpdater.quitAndInstall();
-});
-
-/* =====================
-   IPC - AUTH
-===================== */
-
-ipcMain.handle('login', (event, email, password) => {
-    const token = auth.login(email, password);
-
-    if (!token) {
-        return { success: false, message: 'Usuario o contraseña incorrectos' };
+    if (app.isPackaged) {
+        setTimeout(() => autoUpdater.checkForUpdates(), 3000);
     }
+});
 
-    return { success: true, token };
+/* =====================
+   IPC – AUTH
+===================== */
+
+ipcMain.handle('login', (_, email, password) => {
+    const token = auth.login(email, password);
+    return token
+        ? { success: true, token }
+        : { success: false, message: 'Usuario o contraseña incorrectos' };
 });
 
 ipcMain.handle('get-session', () => auth.getSession());
@@ -174,23 +163,16 @@ ipcMain.handle('logout', () => {
 });
 
 /* =====================
-   IPC - EMPRESA
+   IPC – EMPRESA
 ===================== */
 
 ipcMain.handle('empresa-obtener', () => empresa.obtener());
 
-ipcMain.handle('empresa-guardar', (e, data) => {
-    if (!data.nombre) {
-        return { success: false, message: 'Nombre obligatorio' };
-    }
-
+ipcMain.handle('empresa-guardar', (_, data) => {
+    if (!data.nombre) return { success: false, message: 'Nombre obligatorio' };
     empresa.actualizar(data);
     return { success: true };
 });
-
-/* =====================
-   IPC - EMPRESA LOGO
-===================== */
 
 ipcMain.handle('empresa-cambiar-logo', async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -198,9 +180,7 @@ ipcMain.handle('empresa-cambiar-logo', async () => {
         filters: [{ name: 'PNG Images', extensions: ['png'] }]
     });
 
-    if (canceled || !filePaths.length) {
-        return { success: false };
-    }
+    if (canceled || !filePaths.length) return { success: false };
 
     const origen = filePaths[0];
     if (path.extname(origen).toLowerCase() !== '.png') {
@@ -208,13 +188,11 @@ ipcMain.handle('empresa-cambiar-logo', async () => {
     }
 
     const destino = path.join(app.getPath('userData'), 'logo.png');
-
     fs.copyFileSync(origen, destino);
 
     db.prepare(`
         UPDATE empresa
-        SET logo = 'logo.png',
-            updated_at = CURRENT_TIMESTAMP
+        SET logo = 'logo.png', updated_at = CURRENT_TIMESTAMP
         WHERE id = 1
     `).run();
 
@@ -225,95 +203,125 @@ ipcMain.handle('empresa-logo-path', () =>
     path.join(app.getPath('userData'), 'logo.png')
 );
 
-/* =====================
-   IPC - APP
-===================== */
-
-ipcMain.on('exit-app', () => app.quit());
 
 /* =====================
-   IPC - PDF
+   IPC - guardar recibo
 ===================== */
 
-ipcMain.handle('generar-pdf', async (event, recibo) => {
+ipcMain.on('exit-app', () => {
+    app.quit();
+});
+
+ipcMain.handle('guardar-recibo', (event, recibo) => {
+    const stmt = db.prepare('INSERT INTO recibos (data) VALUES (?)');
+    const result = stmt.run(JSON.stringify(recibo));
+    return { id: result.lastInsertRowid };
+});
+
+/* =====================
+   IPC – ENTIDADES
+===================== */
+
+ipcMain.handle('entidades-listar', () => entidades.listar());
+
+ipcMain.handle('entidades-crear', (_, data) => {
+    if (!data.nombre) return { success: false };
+    const id = entidades.crear(data);
+    return { success: true, id };
+});
+
+/* =====================
+   IPC – DASHBOARD
+===================== */
+
+ipcMain.handle('dashboard-stats', () => {
+    const totalRecibos = db.prepare('SELECT COUNT(*) as total FROM recibos').get().total;
+    const totalEntidades = db.prepare('SELECT COUNT(*) as total FROM entidades').get().total;
+    return { totalRecibos, totalEntidades };
+});
+
+/* =====================
+   IPC – PDF
+===================== */
+
+ipcMain.handle('generar-pdf', async (_, recibo) => {
     try {
         const empresaData = empresa.obtener();
         const reciboCompleto = { ...recibo, empresa: empresaData };
 
-        const documentsPath = app.getPath('documents');
-        const baseFolder = path.join(documentsPath, 'Billerdoc-Recibos');
-
+        const base = path.join(app.getPath('documents'), 'Billerdoc-Recibos');
         const fecha = new Date(recibo.fecha + 'T00:00:00');
-        const folderYear = fecha.getFullYear();
-        const folderMonth = String(fecha.getMonth() + 1).padStart(2, '0');
+        const folder = path.join(
+            base,
+            `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`
+        );
 
-        const monthFolder = path.join(baseFolder, `${folderYear}-${folderMonth}`);
-        fs.mkdirSync(monthFolder, { recursive: true });
+        fs.mkdirSync(folder, { recursive: true });
 
-        await generarReciboConPlantilla(reciboCompleto, 'ORIGINAL', monthFolder);
-        await generarReciboConPlantilla(reciboCompleto, 'COPIA', monthFolder);
+        await generarReciboConPlantilla(reciboCompleto, 'ORIGINAL', folder);
+        await generarReciboConPlantilla(reciboCompleto, 'COPIA', folder);
 
         return { success: true };
 
     } catch (err) {
-        log.error('❌ ERROR PDF:', err);
+        log.error(err);
         return { success: false, message: err.message };
     }
 });
 
 /* =====================
-   IPC - RECIBOS
+   IPC – RECIBOS
 ===================== */
 
 ipcMain.handle('get-recibos', () => {
     const rows = db.prepare(`
-        SELECT id, data
-        FROM recibos
-        ORDER BY id DESC
+        SELECT id, data FROM recibos ORDER BY id DESC
     `).all();
 
     return rows.map(r => {
         const d = JSON.parse(r.data);
-        return {
-            id: r.id,
-            cliente: d.cliente,
-            fecha: d.fecha,
-            total: d.total
-        };
+        return { id: r.id, cliente: d.cliente, fecha: d.fecha, total: d.total };
     });
 });
 
 /* =====================
-   IPC - ABRIR RECIBO
+   IPC – ABRIR RECIBO
 ===================== */
 
-ipcMain.handle('abrir-recibo', async (event, id, tipo = 'ORIGINAL') => {
+ipcMain.handle('abrir-recibo', async (_, id, tipo = 'ORIGINAL') => {
     const baseDir = path.join(app.getPath('documents'), 'Billerdoc-Recibos');
     const sufijo = `-${id}_${tipo}.pdf`;
-
     let encontrado = null;
 
-    function buscar(dir) {
+    const buscar = dir => {
         for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
             const full = path.join(dir, e.name);
             if (e.isDirectory()) buscar(full);
             else if (e.name.endsWith(sufijo)) encontrado = full;
         }
-    }
+    };
 
     buscar(baseDir);
 
-    if (!encontrado) {
-        return { success: false, message: 'PDF no encontrado' };
-    }
+    if (!encontrado) return { success: false, message: 'PDF no encontrado' };
 
     await shell.openPath(encontrado);
     return { success: true };
 });
 
 /* =====================
-   APP QUIT
+   IPC – UPDATES
 ===================== */
+
+ipcMain.handle('updates-check', () => autoUpdater.checkForUpdates());
+ipcMain.handle('updates-download', () => autoUpdater.downloadUpdate());
+ipcMain.handle('updates-install', () => autoUpdater.quitAndInstall());
+
+/* =====================
+   EXIT
+===================== */
+
+ipcMain.on('exit-app', () => app.quit());
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();

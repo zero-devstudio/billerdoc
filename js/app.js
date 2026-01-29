@@ -264,6 +264,7 @@ async function cargarVista(nombre) {
         if (nombre === 'emitidos') activarEmitidos();
         if (nombre === 'entidades') activarEntidades();
         if (nombre === 'cuenta') activarCuenta();
+        if (nombre === 'updates') activarUpdates();
 
     } catch (err) {
         content.innerHTML = `<h2>Error cargando la vista</h2>`;
