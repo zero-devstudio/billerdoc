@@ -139,9 +139,9 @@ app.whenReady().then(async () => {
     splashWindow?.close();
     mainWindow.show();
 
-    if (app.isPackaged) {
+    /*if (app.isPackaged) {
         setTimeout(() => autoUpdater.checkForUpdates(), 3000);
-    }
+    }*/
 });
 
 /* =====================
@@ -313,9 +313,32 @@ ipcMain.handle('abrir-recibo', async (_, id, tipo = 'ORIGINAL') => {
    IPC – UPDATES
 ===================== */
 
-ipcMain.handle('updates-check', () => autoUpdater.checkForUpdates());
-ipcMain.handle('updates-download', () => autoUpdater.downloadUpdate());
-ipcMain.handle('updates-install', () => autoUpdater.quitAndInstall());
+ipcMain.handle('updates-check', async () => {
+    if (!app.isPackaged) {
+        return { skipped: true, reason: 'dev-mode' };
+    }
+
+    try {
+        return await autoUpdater.checkForUpdates();
+    } catch (err) {
+        log.error('Update check error:', err);
+        throw err;
+    }
+});
+
+ipcMain.handle('updates-download', async () => {
+    try {
+        return await autoUpdater.downloadUpdate();
+    } catch (err) {
+        log.error('Update download error:', err);
+        throw err;
+    }
+});
+
+ipcMain.handle('updates-install', () => {
+    autoUpdater.quitAndInstall(false, true);
+});
+
 
 /* =====================
    EXIT
