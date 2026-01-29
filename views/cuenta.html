@@ -1,0 +1,44 @@
+<div class="emitidos cuenta-view">
+
+  <h2>Mi empresa</h2>
+
+  <div class="empresa-card">
+
+    <div class="empresa-logo">
+        <img id="empresaLogo" src="" alt="Logo empresa">
+        <button id="btnCambiarLogo">Cambiar logo</button>
+    </div>
+
+    <div class="empresa-datos">
+        <p><strong>Razón social:</strong> <span id="empresaNombre"></span></p>
+        <p><strong>NIT:</strong> <span id="empresaNit"></span></p>
+        <p><strong>Dirección:</strong> <span id="empresaDireccion"></span></p>
+        <p><strong>Teléfono:</strong> <span id="empresaTelefono"></span></p>
+        <p><strong>Correo:</strong> <span id="empresaCorreo"></span></p>
+
+        <button id="btnEditarEmpresa">Editar datos</button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL EDITAR EMPRESA -->
+<div id="modalEmpresa" class="modal hidden">
+
+    <div class="modal-content">
+        <h3>Editar empresa</h3>
+        <label>Razón social<input type="text" id="editNombre"></label>
+        <label>NIT<input type="text" id="editNit"></label>
+        <label>Dirección<input type="text" id="editDireccion"></label>
+        <label>Teléfono<input type="text" id="editTelefono"></label>
+        <label>Correo<input type="email" id="editCorreo"></label>
+
+        <div class="modal-actions">
+            <button id="btnCancelarEmpresa">Cancelar</button>
+            <button id="btnGuardarEmpresa">Guardar</button>
+        </div>
+    </div>
+
+</div>
+

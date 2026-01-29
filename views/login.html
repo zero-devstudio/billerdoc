@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Billerdoc</title>
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+
+    <div class="login-wrapper">
+
+        <div class="login-card">
+
+            <!-- LOGO -->
+            <div class="logo">
+                <img src="../assets/logo_Billerdoc.png" alt="Billerdoc">
+            </div>
+
+            <p class="subtitle">Bienvenido</p>
+            <p class="description">Ingresa a tu cuenta y gestiona tus recibos</p>
+
+            <!-- FORM -->
+            <form id="loginForm">
+
+                <input
+                    id="email"
+                    type="text"
+                    placeholder="Usuario"
+                    autocomplete="username"
+                />
+
+                <input
+                    id="password"
+                    type="password"
+                    placeholder="Contraseña"
+                    autocomplete="current-password"
+                />
+
+                <label class="remember">
+                    <input type="checkbox" id="remember">
+                    Recordar mis datos
+                </label>
+
+                <button type="submit">Entrar</button>
+
+            </form>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            Billerdoc v1.0 · Desarrollado por zeroDev<br>
+            contacto: 3007240742
+        </footer>
+
+    </div>
+
+    <script src="../js/login.js"></script>
+</body>
+</html>

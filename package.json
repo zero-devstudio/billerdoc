@@ -1,0 +1,51 @@
+{
+    "name": "billerdoc",
+    "version": "1.0.1",
+    "main": "main.js",
+    "author": "",
+    "license": "ISC",
+    "description": "Sistema de recibos en Electron",
+
+    "scripts": {
+        "dev": "electron .",
+        "build": "electron-builder"
+    },
+
+    "build": {
+        "appId": "com.billerdoc.app",
+        "productName": "Billerdoc",
+        "directories": {
+            "output": "dist"
+        },
+        "files": [
+            "**/*"
+        ],
+        "win": {
+            "icon": "assets/icon.ico"
+        },
+        "nsis": {
+            "oneClick": true,
+            "perMachine": false
+        },
+        "publish": [
+            {
+                "provider": "github",
+                "owner": "zero-devstudio",
+                "repo": "billerdoc"
+            }
+        ]
+    },
+
+    "devDependencies": {
+        "electron": "^39.2.7",
+        "electron-builder": "^26.4.0",
+        "electron-rebuild": "^3.2.9",
+        "electron-updater": "^6.7.3"
+    },
+
+    "dependencies": {
+        "better-sqlite3": "^12.6.2",
+        "electron-store": "^11.0.2",
+        "pdf-lib": "^1.17.1"
+    }
+}

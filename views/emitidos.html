@@ -1,0 +1,40 @@
+<div class="emitidos">
+
+    <h2>Historial de recibos</h2>
+
+    <div class="emitidos-toolbar">
+        <div class="search">
+            <input type="text" id="searchNombre" placeholder="Buscar por nombre">
+        </div>
+
+        <div class="search">
+            <input type="date" id="searchDesde">
+        </div>
+
+        <div class="search">
+            <input type="date" id="searchHasta">
+        </div>
+        <button id="btnClearFilters" class="reset_filter">x</button>
+    </div>
+
+
+    <div class="emitidos-header">
+        <span>id</span>
+        <span>Fecha</span>
+        <span>Nombre</span>
+        <span>Valor</span>
+        <span></span>
+    </div>
+
+    <div id="emitidos-list" class="emitidos-list"></div>
+    
+    <div class="paginacion" id="emitidos-pagination">
+        <button id="prevPage">◀ Anterior</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage">Siguiente ▶</button>
+    </div>
+
+
+</div>
+
+<!--<script src="../js/emitidos.js"></script>-->
