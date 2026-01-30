@@ -17,7 +17,7 @@
     --purple-select:#7979FF;
     --color-txt-nav:#4D5A5F;
 
-    --entidades-grid: 80px 2fr 2fr 2fr 2fr 115px;
+    --entidades-grid: 80px 2fr 2fr 2fr 2fr 150px;
 }
 
 body {
@@ -774,19 +774,32 @@ CONTENEDOR ANCLADO ABAJO
 }
 
 
-.crear-recibo-btn {
+.entidades-row button svg{
+    width:18px;
+}
+
+.entidades-row button{
     background: var(--primary-blue);
     color: #fff;
     border: none;
-    padding: 8px 14px;
+    width:35px;height:35px;
     border-radius: 8px;
     font-size: 13px;
     cursor: pointer;
     box-shadow: 0 4px 10px var(--primary-blue-shadow);
 }
 
-.crear-recibo-btn:hover {
+.entidades-row button:hover {
     opacity: .9;
+}
+.edit-btn, .delete-btn{
+    border:1px solid #cbcbcb!important;
+    background:none!important;
+    box-shadow:none!important;
+}
+.entidades-row .edit-btn:hover,
+.entidades-row .delete-btn:hover{
+    background:#efefefdb!important;
 }
 
 /* =========================

@@ -230,6 +230,16 @@ ipcMain.handle('entidades-crear', (_, data) => {
     return { success: true, id };
 });
 
+ipcMain.handle('entidades-actualizar', (_, id, data) => {
+    entidades.actualizar(id, data);
+    return { success: true };
+});
+
+ipcMain.handle('entidades-eliminar', (_, id) => {
+    entidades.eliminar(id);
+    return { success: true };
+});
+
 /* =====================
    IPC – DASHBOARD
 ===================== */

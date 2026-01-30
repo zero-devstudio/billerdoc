@@ -44,7 +44,9 @@ contextBridge.exposeInMainWorld('recibos', {
 
 contextBridge.exposeInMainWorld('entidades', {
     listar: () => ipcRenderer.invoke('entidades-listar'),
-    crear: (data) => ipcRenderer.invoke('entidades-crear', data)
+    crear: (data) => ipcRenderer.invoke('entidades-crear', data),
+    actualizar: (id, data) => ipcRenderer.invoke('entidades-actualizar', id, data),
+    eliminar: (id) => ipcRenderer.invoke('entidades-eliminar', id)
 });
 
 /* =====================
