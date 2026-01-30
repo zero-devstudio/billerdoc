@@ -23,7 +23,6 @@ form.addEventListener('submit', async (e) => {
             return;
         }
 
-        // ✅ LOGIN OK
         window.location.href = '../index.html';
 
     } catch (err) {

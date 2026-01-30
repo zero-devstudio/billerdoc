@@ -23,7 +23,7 @@ async function cargarEmpresa() {
 let eventosConfigurados = false;
 
 function configurarEventosCuenta() {
-    if (eventosConfigurados) return; // 👈 evita duplicar listeners
+    if (eventosConfigurados) return;
     eventosConfigurados = true;
 
     document.addEventListener('click', async (e) => {

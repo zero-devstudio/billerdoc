@@ -32,7 +32,7 @@ module.exports = (db) => {
         },
 
         /* =====================
-           ACTUALIZAR ✏️
+           ACTUALIZAR 
         ===================== */
         actualizar(id, entidad) {
             db.prepare(`
@@ -53,7 +53,7 @@ module.exports = (db) => {
         },
 
         /* =====================
-           ELIMINAR 🗑
+           ELIMINAR 
         ===================== */
         eliminar(id) {
             db.prepare(`

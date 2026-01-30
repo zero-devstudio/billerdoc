@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -63,13 +63,15 @@ function createMainWindow() {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
+        icon: path.join(__dirname, 'assets/icon.ico'),
         show: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
         }
     });
-
+    
     mainWindow.loadFile(session ? 'index.html' : 'views/login.html');
+    Menu.setApplicationMenu(null);
 }
 
 /* =====================
@@ -130,7 +132,7 @@ app.whenReady().then(async () => {
     });
 
     // 🔹 Tiempo mínimo splash
-    const MIN_SPLASH = 18000;
+    const MIN_SPLASH = 1800;
     const elapsed = Date.now() - start;
     if (elapsed < MIN_SPLASH) {
         await new Promise(r => setTimeout(r, MIN_SPLASH - elapsed));
@@ -138,6 +140,7 @@ app.whenReady().then(async () => {
 
     splashWindow?.close();
     mainWindow.show();
+    mainWindow.maximize();
 
     /*if (app.isPackaged) {
         setTimeout(() => autoUpdater.checkForUpdates(), 3000);
@@ -203,14 +206,11 @@ ipcMain.handle('empresa-logo-path', () =>
     path.join(app.getPath('userData'), 'logo.png')
 );
 
-
 /* =====================
    IPC - guardar recibo
 ===================== */
 
-ipcMain.on('exit-app', () => {
-    app.quit();
-});
+ipcMain.on('exit-app', () => {app.quit();});
 
 ipcMain.handle('guardar-recibo', (event, recibo) => {
     const stmt = db.prepare('INSERT INTO recibos (data) VALUES (?)');
@@ -348,7 +348,6 @@ ipcMain.handle('updates-download', async () => {
 ipcMain.handle('updates-install', () => {
     autoUpdater.quitAndInstall(false, true);
 });
-
 
 /* =====================
    EXIT

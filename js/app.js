@@ -41,7 +41,6 @@ const content = document.querySelector('.content');
 const template = document.getElementById('receipt-form-template');
 const menuItems = document.querySelectorAll('.sidebar li');
 
-
 document.addEventListener('click', (e) => {
     const arrow = e.target.closest('.set-icon-arrow');
     if (!arrow) return;
@@ -62,7 +61,6 @@ document.addEventListener('click', (e) => {
     cargarVista(view);
 });
 
-
 function activarMenu(view) {
     const items = document.querySelectorAll('.sidebar li');
 
@@ -70,7 +68,6 @@ function activarMenu(view) {
         li.classList.toggle('active', li.dataset.view === view);
     });
 }
-
 
 function configurarFormulario() {
     const fechaInput = document.getElementById('fechaRecibo');
@@ -86,7 +83,6 @@ function configurarFormulario() {
     fechaInput.min = min;
     fechaInput.max = hoyBogota;
     fechaInput.value = hoyBogota;
-
 
     document.getElementById('btnCancel').onclick = () => {
         cargarVista('dashboard');

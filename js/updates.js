@@ -70,7 +70,7 @@ function activarUpdates() {
     });
 
     window.updates.onDownloaded(() => {
-        setStatus('Actualización lista para instalar 🚀', 'success');
+        setStatus('Actualización lista para instalar', 'success');
         btnInstall.disabled = false;
     });
 

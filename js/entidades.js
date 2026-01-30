@@ -34,10 +34,8 @@ function activarEntidades() {
             let res;
 
             if (entidadEditando) {
-                // ✏️ EDITAR
                 res = await window.entidades.actualizar(entidadEditando.id, data);
             } else {
-                // ➕ CREAR
                 res = await window.entidades.crear(data);
             }
 

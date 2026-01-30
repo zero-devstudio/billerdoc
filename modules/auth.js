@@ -5,7 +5,6 @@ const store = new Store();
 
 const SESSION_DURATION = 1000 * 60 * 60 * 24 * 30;
 
-// 👇 USUARIO TEMPORAL
 const USER = {
     email: 'admin@billerdoc.com',
     password: '123456',
@@ -32,7 +31,6 @@ function login(email, password) {
 
     return token;
 }
-
 
 function getSession() {
     const session = store.get('session');
