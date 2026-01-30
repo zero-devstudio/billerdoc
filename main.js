@@ -130,7 +130,7 @@ app.whenReady().then(async () => {
     });
 
     // 🔹 Tiempo mínimo splash
-    const MIN_SPLASH = 2500;
+    const MIN_SPLASH = 18000;
     const elapsed = Date.now() - start;
     if (elapsed < MIN_SPLASH) {
         await new Promise(r => setTimeout(r, MIN_SPLASH - elapsed));
